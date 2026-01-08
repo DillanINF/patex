@@ -19,16 +19,27 @@
 	}
 
 	.canvas-wrapper {
-		float: left;
-		position: absolute;
-		top: 50%;
-		left: 50%;
+		position: fixed;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		padding: 12px;
+		box-sizing: border-box;
+	}
 
-		-webkit-transform: translate(-50%, -50%);
-		-moz-transform: translate(-50%, -50%);
-		-ms-transform: translate(-50%, -50%);
-		-o-transform: translate(-50%, -50%);
-		transform: translate(-50%, -50%);
+	#canvas {
+		width: 100vw;
+		max-width: 100vw;
+		height: auto;
+		max-height: 100vh;
+		aspect-ratio: 711 / 400;
+		display: block;
 	}
 
 	.key {
