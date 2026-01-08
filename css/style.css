@@ -1185,3 +1185,11 @@ header {
   display: none;
 }
 /*# sourceMappingURL=style.css.map */
+.instagram-link {
+  color: #fff;
+  text-decoration: none;
+}
+
+.instagram-link:hover {
+  color: rgb(255, 0, 0);
+}
