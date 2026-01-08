@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<title>Spiderman Game</title>
 	<link rel="shortcut icon" href="images/standing.png" />
 </head>
@@ -13,6 +14,8 @@
 		margin: 0;
 		font-size: 0;
 		background: #000;
+		touch-action: none;
+		overflow: hidden;
 	}
 
 	.canvas-wrapper {
@@ -71,6 +74,67 @@
 	#start-wrapper {
 		display: none;
 	}
+
+	.mobile-controls {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		padding: 12px;
+		display: none;
+		gap: 12px;
+		z-index: 9999;
+		box-sizing: border-box;
+		user-select: none;
+		-webkit-user-select: none;
+		-webkit-touch-callout: none;
+		pointer-events: none;
+	}
+
+	.mobile-controls .group {
+		display: flex;
+		gap: 12px;
+		align-items: center;
+		pointer-events: auto;
+	}
+
+	.mobile-controls .btn {
+		width: 64px;
+		height: 64px;
+		border-radius: 16px;
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		background: rgba(0, 0, 0, 0.55);
+		color: #fff;
+		font-size: 22px;
+		font-family: Helvetica, Arial, sans-serif;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		backdrop-filter: blur(6px);
+		-webkit-backdrop-filter: blur(6px);
+		touch-action: none;
+	}
+
+	.mobile-controls .btn.wide {
+		width: 110px;
+	}
+
+	.mobile-controls .btn:active {
+		transform: scale(0.98);
+		background: rgba(255, 255, 255, 0.12);
+	}
+
+	.mobile-controls .row {
+		display: flex;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	@media (hover: none) and (pointer: coarse) {
+		.mobile-controls {
+			display: flex;
+		}
+	}
 </style>
 <body>
 	<div class="canvas-wrapper">
@@ -102,6 +166,18 @@
 			<a href="https://github.com/DillanINF/patex" target="_blank">Github</a>
 		</div>
 	</div>
+	<div class="mobile-controls" id="mobile-controls" aria-hidden="true">
+		<div class="row">
+			<div class="group">
+				<button class="btn" id="btn-left" type="button" aria-label="Left">←</button>
+				<button class="btn" id="btn-right" type="button" aria-label="Right">→</button>
+			</div>
+			<div class="group">
+				<button class="btn" id="btn-jump" type="button" aria-label="Jump">↑</button>
+				<button class="btn wide" id="btn-shoot" type="button" aria-label="Shoot">Shoot</button>
+			</div>
+		</div>
+	</div>
 </body>
 <script type="text/javascript" src="spiderman-game.js"></script>
 <script type="text/javascript">
@@ -114,9 +190,47 @@ var game = new SpidermanGame({
 // Playing audio files requires user interaction to occur first.
 // So we have a start button.
 startButton.addEventListener("click", function(e) {
-	game.load();
+	game.load().then(function() {
+		setupMobileControls(game);
+	});
 	startButton.parentElement.style.display = "none";
 });
+
+function setupMobileControls(gameInstance) {
+	var controls = document.getElementById("mobile-controls");
+	if (!controls) return;
+
+	controls.setAttribute("aria-hidden", "false");
+
+	function bindHold(buttonId, keyCode) {
+		var btn = document.getElementById(buttonId);
+		if (!btn) return;
+
+		function down(ev) {
+			if (ev && ev.preventDefault) ev.preventDefault();
+			if (!gameInstance || !gameInstance.spiderman) return;
+			gameInstance.spiderman.keydown(keyCode);
+		}
+
+		function up(ev) {
+			if (ev && ev.preventDefault) ev.preventDefault();
+			if (!gameInstance || !gameInstance.spiderman) return;
+			gameInstance.spiderman.keyup(keyCode);
+		}
+
+		btn.addEventListener("touchstart", down, { passive: false });
+		btn.addEventListener("touchend", up, { passive: false });
+		btn.addEventListener("touchcancel", up, { passive: false });
+		btn.addEventListener("mousedown", down);
+		btn.addEventListener("mouseup", up);
+		btn.addEventListener("mouseleave", up);
+	}
+
+	bindHold("btn-left", 37);
+	bindHold("btn-right", 39);
+	bindHold("btn-jump", 38);
+	bindHold("btn-shoot", 32);
+}
 
 </script>
 </html>
